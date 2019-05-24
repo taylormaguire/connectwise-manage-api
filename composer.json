@@ -1,5 +1,5 @@
 {
-    "name": "taylormaguire/cw-manage-api",
+    "name": "taylormaguire/connectwise-manage-api",
     "description": "A package to interact between Laravel and the ConnectWise Manage API",
     "require": {
         "guzzlehttp/guzzle": "^6.3",

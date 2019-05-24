@@ -1,0 +1,19 @@
+{
+    "name": "taylormaguire/cw-manage-api",
+    "description": "A package to interact between Laravel and the ConnectWise Manage API",
+    "require": {
+        "guzzlehttp/guzzle": "^6.3",
+        "guzzlehttp/psr7": "^1.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "taylormaguire\\CWManageAPI\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Taylor Maguire",
+            "email": "taylor@sequelhosting.com"
+        }
+    ]
+}

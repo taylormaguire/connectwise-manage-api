@@ -1,5 +1,5 @@
-#ConnectWise Manage API for PHP/Laravel
-##.env File Example Code
+# ConnectWise Manage API for PHP/Laravel
+## .env File Example Code
 Add these details to your .env environment file`with your own details as appropriate
 ```php
 CW_API_URL=https://api-na.myconnectwise.net

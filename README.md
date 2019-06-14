@@ -1,4 +1,10 @@
 # ConnectWise Manage API for PHP/Laravel
+## Warning
+Currently building and testing. Not production ready.
+## Installation
+```php
+composer require taylormaguire/connectwise-manage-api
+```
 ## .env File Example Code
 Add these details to your .env environment file with your own details as appropriate
 ```php

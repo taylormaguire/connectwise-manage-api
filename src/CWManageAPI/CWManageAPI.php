@@ -74,7 +74,7 @@ class CWManageAPI
     public function getHeaders()
     {
         return [
-            'clientId'      => $this->getClientId(),
+            'clientId'      => $this->getClientId(), 
             'Authorization' => $this->buildAuth(),
             'Accept'        => 'application/vnd.connectwise.com+json; version=' . $this->getVersion(),
         ];

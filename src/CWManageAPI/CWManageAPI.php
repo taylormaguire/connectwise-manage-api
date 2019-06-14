@@ -18,8 +18,9 @@ class CWManageAPI
         $this->guzzle = $guzzle;
     }
 
-    public function setUrl($url)
+    public function setUrl()
     {
+        $url = env('CW_API_URL');
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             throw new InvalidArgumentException(sprintf("The URL provided[%] is not a valid format.", $url));
         }
@@ -60,12 +61,22 @@ class CWManageAPI
         return 'Basic ' . base64_encode(env('CW_API_PUBLIC_KEY') . ':' . env('CW_API_PRIVATE_KEY'));
     }
 
+    public function getClientId()
+    {
+        return env('CW_CLIENT_ID');
+    }
+
+    public function getVersion()
+    {
+        return env('CW_API_VERSION');
+    }
+
     public function getHeaders()
     {
         return [
             'clientId'      => $this->getClientId(),
             'Authorization' => $this->buildAuth(),
-            'Accept'        => 'application/vnd.connectwise.com+json; version=2019.3',
+            'Accept'        => 'application/vnd.connectwise.com+json; version=' . $this->getVersion(),
         ];
     }
 
@@ -73,7 +84,7 @@ class CWManageAPI
     {
         try {
             $response = $this->guzzle->request(
-                $method,
+                'GET',
                 $this->buildUri($resource),
                 $this->getHeaders($headers)
             );

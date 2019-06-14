@@ -74,16 +74,17 @@ class CWManageAPI
     public function getHeaders()
     {
         return [
-            'clientId'      => $this->getClientId(), 
+            'clientId'      => $this->getClientId(),
             'Authorization' => $this->buildAuth(),
             'Accept'        => 'application/vnd.connectwise.com+json; version=' . $this->getVersion(),
         ];
     }
 
-    public function request($method, $resource, $headers)
+    public static function request($resource)
     {
         try {
-            $response = $this->guzzle->request(
+            $client = new Client();
+            $response = $client->request(
                 'GET',
                 $this->buildUri($resource),
                 $this->getHeaders($headers)

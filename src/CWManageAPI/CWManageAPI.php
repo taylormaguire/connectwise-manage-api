@@ -2,14 +2,92 @@
 
 namespace taylormaguire\CWManageAPI;
 
-use App\Contact;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7;
+use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\Exception\ClientException;
-use App\Customer;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7;
+use GuzzleHttp\Psr7\Response;
 
 class CWManageAPI
 {
+    protected $guzzle;
+
+    public function __construct(Guzzle $guzzle)
+    {
+        $this->guzzle = $guzzle;
+    }
+
+    public function setUrl($url)
+    {
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            throw new InvalidArgumentException(sprintf("The URL provided[%] is not a valid format.", $url));
+        }
+        $this->url = rtrim($url, '/');
+        return $this;
+    }
+
+    public function getUrl()
+    {
+        return $this->url . '/v4_6_release/apis/3.0/';
+    }
+
+    protected function processError(RequestException $exception)
+    {
+        echo Psr7\str($exception->getRequest());
+
+        if ($exception->hasResponse())
+        {
+            echo Psr7\str($exception->getResponse());
+        }
+    }
+
+    public function buildUri($resource)
+    {
+        $uri = $this->getUrl() . ltrim($resource, '/');
+
+        if (strlen($url) > 2000) {
+            throw new MalformedRequest(
+                sprintf('The uri is too long. It is %s character(s) over the 2000 limit.', strlen($uri) - 2000)
+            );
+        }
+
+        return $uri;
+    }
+
+    public function buildAuth()
+    {
+        return 'Basic ' . base64_encode(env('CW_API_PUBLIC_KEY') . ':' . env('CW_API_PRIVATE_KEY'));
+    }
+
+    public function getHeaders()
+    {
+        return [
+            'clientId'      => $this->getClientId(),
+            'Authorization' => $this->buildAuth(),
+            'Accept'        => 'application/vnd.connectwise.com+json; version=2019.3',
+        ];
+    }
+
+    public function request($method, $resource, $headers)
+    {
+        try {
+            $response = $this->guzzle->request(
+                $method,
+                $this->buildUri($resource),
+                $this->getHeaders($headers)
+            );
+            return $this->processResponse($response);
+        } catch (RequestException $e) {
+            $this->processError($e);
+        }
+    }
+
+    public function processResponse(Response $response)
+    {
+        return json_decode($response->getBody(), true);
+    }
+
     public function get($request, $model, $conditions, $fields, $pageSize, $pageNum, $orderBy)
     {
         $client = new Client();
@@ -31,7 +109,6 @@ class CWManageAPI
         } catch (ClientException $e) {
             dd (psr7\str($e->getResponse()));
         }
-
         return $connectwise;
     }
 
@@ -51,7 +128,6 @@ class CWManageAPI
         } catch (ClientException $e) {
             dd (psr7\str($e->getResponse()));
         }
-
         return $connectwise;
     }
 

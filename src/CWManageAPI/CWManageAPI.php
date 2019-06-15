@@ -2,7 +2,7 @@
 
 namespace taylormaguire\CWManageAPI;
 
-use GuzzleHttp\Client as Guzzle;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
@@ -11,43 +11,63 @@ use GuzzleHttp\Psr7\Response;
 
 class CWManageAPI
 {
-    protected $guzzle;
+    protected $request;
 
-    public function __construct(Guzzle $guzzle)
+    private static $with = [
+        'pageSize',
+        'page',
+        'fields',
+        'columns',
+        'orderBy',
+        'customFieldConditions',
+        'childConditions',
+        'conditions',
+    ];
+
+    private static $with_all = [
+        'fields',
+        'columns',
+        'orderBy',
+        'customFieldConditions',
+        'childConditions',
+        'conditions',
+    ];
+
+    public function __construct()
     {
-        $this->guzzle = $guzzle;
+
     }
 
-    public function setUrl()
+    public function url()
     {
         $url = env('CW_API_URL');
+
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             throw new InvalidArgumentException(sprintf("The URL provided[%] is not a valid format.", $url));
         }
-        $this->url = rtrim($url, '/');
-        return $this;
+
+        return rtrim(env('CW_API_URL'), '/') . '/v4_6_release/apis/3.0/';
     }
 
-    public function getUrl()
-    {
-        return $this->url . '/v4_6_release/apis/3.0/';
-    }
-
-    protected function processError(RequestException $exception)
+    protected function error(RequestException $exception)
     {
         echo Psr7\str($exception->getRequest());
 
-        if ($exception->hasResponse())
-        {
+        if ($exception->hasResponse()) {
             echo Psr7\str($exception->getResponse());
         }
     }
 
-    public function buildUri($resource)
+    protected function response(Response $response)
     {
-        $uri = $this->getUrl() . ltrim($resource, '/');
+        return json_decode($response->getBody(), false);
+    }
 
-        if (strlen($url) > 2000) {
+    public function uri($resource)
+    {
+        $uri = $this->url() . ltrim($resource, '/');
+
+        if (strlen($uri) > 2000) {
             throw new MalformedRequest(
                 sprintf('The uri is too long. It is %s character(s) over the 2000 limit.', strlen($uri) - 2000)
             );
@@ -56,171 +76,135 @@ class CWManageAPI
         return $uri;
     }
 
-    public function buildAuth()
+    public function auth()
     {
         return 'Basic ' . base64_encode(env('CW_API_PUBLIC_KEY') . ':' . env('CW_API_PRIVATE_KEY'));
     }
 
-    public function getClientId()
+    public function clientId()
     {
         return env('CW_CLIENT_ID');
     }
 
-    public function getVersion()
+    public function version()
     {
         return env('CW_API_VERSION');
     }
 
-    public function getHeaders()
+    public function headers()
     {
         return [
-            'clientId'      => $this->getClientId(),
-            'Authorization' => $this->buildAuth(),
-            'Accept'        => 'application/vnd.connectwise.com+json; version=' . $this->getVersion(),
+            'clientId' => $this->clientId(),
+            'Authorization' => $this->auth(),
+            'Accept' => 'application/vnd.connectwise.com+json; version=' . $this->version(),
         ];
     }
 
-    public static function request($resource)
+    public function request($method, $model)
     {
         try {
             $client = new Client();
             $response = $client->request(
-                'GET',
-                $this->buildUri($resource),
-                $this->getHeaders($headers)
+                $method,
+                $this->uri($model),
+                [
+                    'headers' => $this->headers(),
+                ]
             );
-            return $this->processResponse($response);
+            return $this->response($response);
         } catch (RequestException $e) {
-            $this->processError($e);
+            $this->error($e);
         }
     }
 
-    public function processResponse(Response $response)
+    public static function count($model)
     {
-        return json_decode($response->getBody(), true);
+        $request = new CWManageAPI();
+        return $request->request('GET', $model . '/count');
     }
 
-    public function get($request, $model, $conditions, $fields, $pageSize, $pageNum, $orderBy)
+    public static function get($model, $options = [])
     {
-        $client = new Client();
-        try {
-            $conditions = "&conditions=" . $conditions;
-            $fields = "&fields=" . $fields;
-            $pageSize = "?pageSize=" . $pageSize;
-            $pageNum = "&page=" . $pageNum;
-            $orderBy = "&orderBy=" . $orderBy;
-            $uri = env('CW_API_URL') . $model . $pageSize . $pageNum . $conditions. $fields . $orderBy;
-            $result = $client->request($request, $uri, [
-                'auth' => [
-                    env('CW_API_PUBLIC_KEY'),
-                    env('CW_API_PRIVATE_KEY')
-                ]
-            ]);
-            $body = $result->getBody();
-            $connectwise = json_decode($body, true);
-        } catch (ClientException $e) {
-            dd (psr7\str($e->getResponse()));
+        $with = self::$with;
+        $options = array_filter($options,
+            function ($key) use ($with) {
+                return in_array($key, $with);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
+
+        if (!empty($options)) {
+            $model = $model . '?';
         }
-        return $connectwise;
-    }
 
-    public function count($model)
-    {
-        $client = new Client();
-        try {
-            $uri = env('CW_API_URL') . $model . '/count';
-            $result = $client->request('GET', $uri, [
-                'auth' => [
-                    env('CW_API_PUBLIC_KEY'),
-                    env('CW_API_PRIVATE_KEY')
-                ]
-            ]);
-            $body = $result->getBody();
-            $connectwise = json_decode($body);
-        } catch (ClientException $e) {
-            dd (psr7\str($e->getResponse()));
+        foreach ($options as $key => $option) {
+            $model = $model . $key . '=' . $option . '&';
         }
-        return $connectwise;
+
+        $request = new CWManageAPI();
+        return $request->request('GET', $model);
     }
 
-    public function get_all_companies()
+    public static function get_all($model, $options = [])
     {
-        $companies = [];
+        $count = CWManageAPI::count($model)->count;
+
+        $with = self::$with_all;
+        $options = array_filter($options,
+            function ($key) use ($with) {
+                return in_array($key, $with);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
 
         $page = 1;
         $pageSize = 1000;
 
-        $companiesCount = CWManageAPI::count('company/companies')->count;
+        $model = $model . '?pageSize=' . $pageSize . '&';
 
-        $pageCount = ceil(($companiesCount / $pageSize));
+        foreach ($options as $key => $option) {
+            $model = $model . $key . '=' . $option . '&';
+        }
+
+        $data = [];
+
+        $request = new CWManageAPI();
+
+        $pageCount = ceil(($count / $pageSize));
 
         while ($page <= $pageCount) {
-            $res = CWManageAPI::get('GET', 'company/companies', '', 'id,name', $pageSize, $page, 'id desc');
-            if (count($res) > 0) {
-                $companies = array_merge($companies, $res);
+            $response = $request->request('GET', $model . '&page=' . $page);
+            if (count($response) > 0) {
+                $data = array_merge($data, $response);
             }
             $page++;
         }
 
-        foreach ($companies as $company) {
-            Customer::updateOrCreate(
-                ['cw_company_id' => $company['id']],
-                ['customer' => $company['name']]
-            );
-        }
-
-        return $companies;
+        return $data;
     }
 
-    public function get_all_contacts()
+    public static function post($model)
     {
-        $contacts = [];
-
-        $page = 1;
-        $pageSize = 1000;
-
-        $contactsCount = CWManageAPI::count('company/contacts')->count;
-        $pageCount = ceil(($contactsCount / $pageSize));
-
-        while ($page <= $pageCount) {
-            $res = CWManageAPI::get('GET', 'company/contacts', '', 'id,firstName,lastName,company/id', $pageSize, $page, 'id desc');
-            if (count($res) > 0) {
-                $contacts = array_merge($contacts, $res);
-            }
-            $page++;
-        }
-
-        $list = [];
-        foreach ($contacts as $contact) {
-            $data = [
-                'cw_contact_id' => $contact['id'],
-                'first_name' => $contact['firstName'],
-                'last_name' => isset($contact['lastName']) ? $contact['lastName'] : '',
-                'cw_company_id' => isset($contact['company']['id']) ? $contact['company']['id'] : null
-            ];
-            array_push($list, $data);
-        }
-
-        $collection = collect($list);
-        $chunks = $collection->chunk(100);
-        $chunks->toArray();
-
-        foreach ($chunks as $chunk) {
-            $stuff = $chunk->toArray();
-            echo $stuff . "<br>";
-//            Contact::insert($chunk->toArray());
-//            Contact::updateOrCreate(
-//                [
-//                    'cw_contact_id' => $stuff['cw_contact_id']
-//                ],
-//                [
-//                    'cw_contact_id' => $stuff['cw_contact_id'],
-//                    'first_name' => $stuff['first_name'],
-//                    'last_name' => $stuff['last_name'],
-//                    'cw_company_id' => $stuff['cw_company_id']
-//                ]
-//            );
-        }
-        return $contacts;
+        $request = new CWManageAPI();
+        return $request->request('POST', $model);
     }
+
+    public static function put($model)
+    {
+        $request = new CWManageAPI();
+        return $request->request('PUT', $model);
+    }
+
+    public static function patch($model)
+    {
+        $request = new CWManageAPI();
+        return $request->request('PATCH', $model);
+    }
+
+    public static function delete($model)
+    {
+        $request = new CWManageAPI();
+        return $request->request('DELETE', $model);
+    }
+
 }

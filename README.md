@@ -77,6 +77,8 @@ Accepted Query String Parameters can be found [here](https://developer.connectwi
 Here is an GET Request Example using the Facade
 
 ```php
+use taylormaguire\CWManageAPI\CWManageAPI;
+
 CWManageAPI::get('company/companies', [
     'pageSize' => 30,
     'page' => 1,

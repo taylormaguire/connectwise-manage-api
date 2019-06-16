@@ -12,8 +12,47 @@ Install the package through composer in your terminal.
 composer require taylormaguire/connectwise-manage-api
 ```
 
-### Setup The Environment (.env File)
-Add these details to your .env environment file with your own details as appropriate.
+### Setup The Environment (.env File) for Authentication
+Add these details to your .env environment file with your own details as appropriate. This package utilizes the ConnectWise Manage Member Authentication method. Details are found here: https://developer.connectwise.com/Products/Manage/Developer_Guide#Authentication
+
+Each Environment Variable is REQUIRED for a successful connection.
+
+```
+CW_API_URL=
+CW_CLIENT_ID=
+CW_API_VERSION=
+CW_COMPANY_ID=
+CW_API_PUBLIC_KEY=
+CW_API_PRIVATE_KEY=
+```
+
+#### API URL (CW_API_URL)
+Input your Manage URL. For Cloud or Staging servers you must put "api-" in front of the ConnectWise Manage URL.
+
+```
+https://api-au.myconnectwise.net
+https://api-eu.myconnectwise.net
+https://api-na.myconnectwise.net
+https://api-staging.myconnectwise.net
+```
+
+#### Client ID (CW_CLIENT_ID)
+The Client ID is now required per application as of version 2019.3 of the Manage API. Learn about the Client ID and Generate your applications Client ID here: https://developer.connectwise.com/ClientID#What_is_a_clientId
+
+#### API Version (CW_API_VERSION)
+Default recommendation is 2019.3 however you can use an older version by changing this environment variable.
+
+#### Company ID (CW_COMPANY_ID)
+Every ConnectWise Manage instance has a Company ID used for login.
+
+#### Public Key (CW_API_PUBLIC_KEY) & Private Key (CW_API_PRIVATE_KEY)
+The Public Key is a combination of your Company ID and your Public Key. For Example
+```
+company+PflTy8uZrw9yLoz6
+```
+The Public & Private Keys are generated from inside of the ConnectWise Manage application. For instructions on how to create this account go here: https://developer.connectwise.com/Products/Manage/Developer_Guide#Authentication
+
+#### Complete Environment Example
 
 ```
 CW_API_URL=https://api-na.myconnectwise.net
@@ -23,12 +62,11 @@ CW_COMPANY_ID=company
 CW_API_PUBLIC_KEY=company+PflTy8uZrw9yLoz6
 CW_API_PRIVATE_KEY=da34naA8Cja39aE1
 ```
-
 ## Usage
 ### GET Request
 Collect data from the ConnectWise Manage API using the query string parameters provided in the ConnectWise Manage API Documentation. This package will only passthrough keys that are provided by ConnectWise for Query String integrity.
 
-Query String Parameters can be found here:
+Accepted Query String Parameters can be found here:
 https://developer.connectwise.com/Products/Manage/Developer_Guide#Query_String_Parameters
 
 #### Example GET Request
@@ -46,5 +84,5 @@ CWManageAPI::get('company/companies', [
 The example above will output a query string of
 
 ```
-/company/companies?pageSize=30&page=1&orderBy=company/name%20%asc&fields=id,company/name,status
+https://api-na.myconnectwise.net/company/companies?pageSize=30&page=1&orderBy=company/name%20%asc&fields=id,company/name,status
 ```

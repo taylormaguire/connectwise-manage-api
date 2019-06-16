@@ -185,26 +185,22 @@ class CWManageAPI
 
     public static function post($model)
     {
-        $request = new CWManageAPI();
-        return $request->request('POST', $model);
+
     }
 
     public static function put($model)
     {
-        $request = new CWManageAPI();
-        return $request->request('PUT', $model);
+
     }
 
     public static function patch($model)
     {
-        $request = new CWManageAPI();
-        return $request->request('PATCH', $model);
+
     }
 
     public static function delete($model)
     {
-        $request = new CWManageAPI();
-        return $request->request('DELETE', $model);
+
     }
 
 }

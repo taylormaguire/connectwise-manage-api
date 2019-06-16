@@ -88,4 +88,4 @@ https://api-na.myconnectwise.net/company/companies?pageSize=30&page=1&orderBy=co
 ```
 
 #### Query String Parameters & Conditionals
-[Screenshot](https://github.com/taylormaguire/connectwise-manage-api/blob/master/connectwise_query_string_parameters.png)
+![Screenshot](https://github.com/taylormaguire/connectwise-manage-api/blob/master/connectwise_query_string_parameters.png)

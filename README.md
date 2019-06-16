@@ -13,7 +13,7 @@ composer require taylormaguire/connectwise-manage-api
 ```
 
 ### Setup The Environment (.env File) for Authentication
-Add these details to your .env environment file with your own details as appropriate. This package utilizes the ConnectWise Manage Member Authentication method. Details are found here: https://developer.connectwise.com/Products/Manage/Developer_Guide#Authentication
+Add these details to your .env environment file with your own details as appropriate. This package utilizes the ConnectWise Manage Member Authentication method. Details are found [here](https://developer.connectwise.com/Products/Manage/Developer_Guide#Authentication).
 
 Each Environment Variable is REQUIRED for a successful connection.
 
@@ -37,7 +37,7 @@ https://api-staging.myconnectwise.net
 ```
 
 #### Client ID (CW_CLIENT_ID)
-The Client ID is now required per application as of version 2019.3 of the Manage API. Learn about the Client ID and Generate your applications Client ID here: https://developer.connectwise.com/ClientID#What_is_a_clientId
+The Client ID is now required per application as of version 2019.3 of the Manage API. Learn about the Client ID and Generate your applications Client ID [here](https://developer.connectwise.com/ClientID#What_is_a_clientId).
 
 #### API Version (CW_API_VERSION)
 Default recommendation is 2019.3 however you can use an older version by changing this environment variable.
@@ -50,7 +50,7 @@ The Public Key is a combination of your Company ID and your Public Key. For Exam
 ```
 company+PflTy8uZrw9yLoz6
 ```
-The Public & Private Keys are generated from inside of the ConnectWise Manage application. For instructions on how to create this account go here: https://developer.connectwise.com/Products/Manage/Developer_Guide#Authentication
+The Public & Private Keys are generated from inside of the ConnectWise Manage application. For instructions on how to create this account go [here](https://developer.connectwise.com/Products/Manage/Developer_Guide#Authentication).
 
 #### Complete Environment Example
 
@@ -66,8 +66,7 @@ CW_API_PRIVATE_KEY=da34naA8Cja39aE1
 ### GET Request
 Collect data from the ConnectWise Manage API using the query string parameters provided in the ConnectWise Manage API Documentation. This package will only passthrough keys that are provided by ConnectWise for Query String integrity.
 
-Accepted Query String Parameters can be found here:
-https://developer.connectwise.com/Products/Manage/Developer_Guide#Query_String_Parameters
+Accepted Query String Parameters can be found [here](https://developer.connectwise.com/Products/Manage/Developer_Guide#Query_String_Parameters).
 
 #### Example GET Request
 Here is an GET Request Example using the Facade

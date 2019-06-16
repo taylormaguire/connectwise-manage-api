@@ -87,5 +87,7 @@ The example above will output a query string of
 https://api-na.myconnectwise.net/company/companies?pageSize=30&page=1&orderBy=company/name%20%asc&fields=id,company/name,status
 ```
 
-#### Query String Parameters & Conditionals
+#### Query String Parameters
 ![Screenshot](https://github.com/taylormaguire/connectwise-manage-api/blob/master/connectwise_query_string_parameters.png)
+#### Conditionals
+![Screenshot](https://github.com/taylormaguire/connectwise-manage-api/blob/master/connectwise_conditionals.png)

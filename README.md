@@ -1,7 +1,12 @@
-# ConnectWise Manage API for PHP/Laravel
+# ConnectWise Manage API for Laravel / PHP
+This is a package created to simplify connection requests to the ConnectWise Manage API for Laravel and PHP based applications.
 
 ## Warning
-Currently building and testing. Not production ready.
+This package is currently in development. Not suggested for production at this time.
+
+## Requirements
+- Guzzle 6.3
+- Laravel 5.7+ 
 
 ## Installation
 
